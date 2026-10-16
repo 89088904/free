@@ -1,0 +1,54 @@
+name: iOS iPhone Sideload
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Build unsigned iPhone IPA
+    runs-on: macos-15
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+
+      - name: Build unsigned iPhone app
+        run: |
+          set -euo pipefail
+          xcodebuild \
+            -project FoodOrderApp.xcodeproj \
+            -scheme FoodOrderApp \
+            -configuration Release \
+            -sdk iphoneos \
+            -destination 'generic/platform=iOS' \
+            -derivedDataPath "$RUNNER_TEMP/DerivedData" \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGN_IDENTITY='' \
+            build
+
+      - name: Package unsigned IPA for AltStore
+        run: |
+          set -euo pipefail
+          app="$RUNNER_TEMP/DerivedData/Build/Products/Release-iphoneos/FoodOrderApp.app"
+          payload="$RUNNER_TEMP/Payload"
+          ipa="$RUNNER_TEMP/FoodOrderApp-unsigned.ipa"
+          if [[ ! -d "$app" ]]; then
+            echo "::error::The iPhone app was not produced at $app"
+            exit 1
+          fi
+          mkdir "$payload"
+          ditto "$app" "$payload/FoodOrderApp.app"
+          cd "$RUNNER_TEMP"
+          /usr/bin/zip -qry "$ipa" Payload -x 'Payload/**/*.DS_Store'
+          test -s "$ipa"
+
+      - name: Upload IPA
+        uses: actions/upload-artifact@v4
+        with:
+          name: FoodOrderApp-unsigned-iphone
+          path: ${{ runner.temp }}/FoodOrderApp-unsigned.ipa
+          if-no-files-found: error
+          retention-days: 14
