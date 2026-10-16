@@ -26,6 +26,8 @@ GitHub Actions нь iOS Simulator build-ийг macOS runner дээр төсли�
 
 Эдгээрийг тохируулсны дараа Actions → **iOS TestFlight** → **Run workflow** гэж ажиллуулна. App Store Connect build-ийг боловсруулж дууссаны дараа TestFlight-аар iPhone-д суулгана. Signed IPA нь workflow run-ийн `FoodOrderApp-iphone-signed` artifact хэлбэрээр мөн хадгалагдана. Нууц түлхүүр, сертификатыг эх код эсвэл чатад бүү оруул.
 
+App Store Connect аппын бүртгэлгүйгээр хувийн iPhone дээр түр туршихын тулд Actions → **iOS iPhone Sideload** → **Run workflow** гэж ажиллуул. `FoodOrderApp-unsigned-iphone` IPA artifact-ийг татаж аваад [AltStore](https://altstore.io/)-оор хувийн Apple ID ашиглан өөрөө гарын үсэг зурж суулгана. Энэ IPA нь урьдчилан гарын үсэггүй тул iPhone дээр шууд суухгүй. Үнэгүй Apple ID-гаар суулгасан аппын гарын үсгийг хугацаа дуусахад дахин сэргээх шаардлагатай; AltStore-ийн өөрийн зааврыг дага.
+
 ### Android
 
 `C:\lesson` хавтсыг Android Studio дээр нээж, Gradle синк хийсний дараа `app` тохиргоог Android эмулятор эсвэл төхөөрөмж дээр ажиллуулна. Android хувилбар нь Android SDK 35 болон JDK 17 ашиглана.
