@@ -1,0 +1,44 @@
+name: iOS Build
+
+on:
+  push:
+    paths:
+      - "FoodOrderApp/**"
+      - "FoodOrderApp.xcodeproj/**"
+      - ".github/workflows/ios-build.yml"
+  pull_request:
+    paths:
+      - "FoodOrderApp/**"
+      - "FoodOrderApp.xcodeproj/**"
+      - ".github/workflows/ios-build.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Build iOS Simulator app
+    runs-on: macos-15
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+
+      - name: Build app
+        run: >-
+          xcodebuild
+          -project FoodOrderApp.xcodeproj
+          -scheme FoodOrderApp
+          -configuration Debug
+          -sdk iphonesimulator
+          -destination 'generic/platform=iOS Simulator'
+          -derivedDataPath "$RUNNER_TEMP/DerivedData"
+          CODE_SIGNING_ALLOWED=NO
+          build
+
+      - name: Upload simulator app
+        uses: actions/upload-artifact@v4
+        with:
+          name: FoodOrderApp-ios-simulator
+          path: ${{ runner.temp }}/DerivedData/Build/Products/Debug-iphonesimulator/FoodOrderApp.app
+          if-no-files-found: error
